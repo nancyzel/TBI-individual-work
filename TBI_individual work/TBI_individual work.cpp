@@ -1,11 +1,51 @@
-﻿// TBI_individual work.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
+﻿#include <iostream>
+#include <windows.h>
 
-#include <iostream>
+using namespace std;
+
+/// <summary>
+/// структура записей для массива исходных данных - студенты
+/// </summary>
+struct Student {
+    unsigned int studentID; // номер студенческого билета (уникальный ключ)
+    string studentSurname; // фамилия студента
+    string studentName; // имя студента
+    string studentSecondName; // отчество студента
+    string studentEmail; // корпоративная почта студента
+    string studentSportRanking; // спортивный разряд студента
+    unsigned char studentHealthCategory; // номер группы здоровья студента
+    string studentSportActivity; // спортивная секция, на которую записан студент
+    unsigned short studentSportActivityAttendanceNumber; // число посещений студентом спортивной секции
+};
+
+bool CheckIfArrayIsEmpty(Student* ptr_studentsArray) {
+    return ptr_studentsArray == NULL;
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    SetConsoleOutputCP(1251);
+
+    Student* ptr_studentsArray;
+    unsigned int arrayLength;
+
+    cout << "Введите число записей в массиве: ";
+    cin >> arrayLength;
+
+    ptr_studentsArray = (Student*)malloc(arrayLength * sizeof(Student));
+
+    if (CheckIfArrayIsEmpty(ptr_studentsArray)) 
+    {
+        cout << "Память для массива исходных данных была выделена." << endl;
+    }
+    else 
+    {
+        cout << "Память для массива исходных данных не была выделена." << endl;
+    }
+
+    free(ptr_studentsArray);
+
+    return 0;
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"

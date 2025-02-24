@@ -23,11 +23,17 @@ struct Student {
 	unsigned short studentSportActivityAttendanceNumber; // число посещений студентом спортивной секции
 };
 
+/// <summary>
+/// индекс-массив для фамилий студентов
+/// </summary>
 struct StudentSurnameIndex {
 	int initialIndex;
 	string studentSurname;
 };
 
+/// <summary>
+/// индекс-массив для числа посещений секций студентами
+/// </summary>
 struct StudentAttendanceNumberIndex {
 	int initialIndex;
 	unsigned short studentSportActivityAttendanceNumber;
@@ -234,6 +240,10 @@ static void PrintSortedArray(unsigned short arrayLength, Student* ptr_studentsAr
 	cout << "_________________________________________________________________________________" << endl;
 }
 
+static void ReverseArray(StudentAttendanceNumberIndex* ptr_indexesAttendance) {
+
+}
+
 static int ConductBinarySearch(string soughtSurname, StudentSurnameIndex* ptr_indexesSurname, int leftLimit, int rightLimit) {
 	if (leftLimit > rightLimit) {
 		return -1; // Элемент не найден
@@ -249,6 +259,24 @@ static int ConductBinarySearch(string soughtSurname, StudentSurnameIndex* ptr_in
 	}
 	else {
 		return ConductBinarySearch(soughtSurname, ptr_indexesSurname, middlePointer + 1, rightLimit); // Ищем в правой половине
+	}
+}
+
+static int ConductBinarySearch(int soughtSurname, StudentAttendanceNumberIndex* ptr_indexesAttendance, int leftLimit, int rightLimit) {
+	if (leftLimit > rightLimit) {
+		return -1; // Элемент не найден
+	}
+
+	int middlePointer = leftLimit + (rightLimit - leftLimit) / 2; // Находим средний индекс
+
+	if (GetKeyValue(ptr_indexesAttendance[middlePointer]) == soughtSurname) {
+		return middlePointer; // Элемент найден, возвращаем индекс
+	}
+	else if (GetKeyValue(ptr_indexesAttendance[middlePointer]) > soughtSurname) {
+		return ConductBinarySearch(soughtSurname, ptr_indexesAttendance, leftLimit, middlePointer - 1); // Ищем в левой половине
+	}
+	else {
+		return ConductBinarySearch(soughtSurname, ptr_indexesAttendance, middlePointer + 1, rightLimit); // Ищем в правой половине
 	}
 }
 
@@ -402,9 +430,16 @@ int main()
 		int menuPointRedact;
 		do {
 			cout << "Выберите, какое значение вы хотите отредактировать:" << endl;
-			cout << "1. Фамилию студента." << endl;
-			cout << "2. Количество посещений спортивной секции у студента." << endl;
-			cout << "3. Завершить редактирование." << endl;
+			cout << "1. Номер студенческого билета студента." << endl;
+			cout << "2. Фамилию студента." << endl;
+			cout << "3. Имя студента." << endl;
+			cout << "4. Отчество студента." << endl;
+			cout << "5. Адрес корпоративной электронной почты студента." << endl;
+			cout << "6. Спортивный разряд студента." << endl;
+			cout << "7. Номер группы здоровья студента." << endl;
+			cout << "8. Спортивную секцию, на которую записался студент." << endl;
+			cout << "9. Количество посещений спортивной секции у студента." << endl;
+			cout << "10. Завершить редактирование." << endl;
 			cout << "Введите номер выбранного вами пункта: ";
 			cin >> menuPointRedact;
 

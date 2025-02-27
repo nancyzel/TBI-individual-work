@@ -240,8 +240,14 @@ static void PrintSortedArray(unsigned short arrayLength, Student* ptr_studentsAr
 	cout << "_________________________________________________________________________________" << endl;
 }
 
-static void ReverseArray(StudentAttendanceNumberIndex* ptr_indexesAttendance) {
-
+static StudentAttendanceNumberIndex* ReverseArray(StudentAttendanceNumberIndex* ptr_indexesAttendance, int arrayLength) {
+	StudentAttendanceNumberIndex temporaryElement;
+	for (int i = 0; i < arrayLength / 2; i++) {
+		temporaryElement = ptr_indexesAttendance[i];
+		ptr_indexesAttendance[i] = ptr_indexesAttendance[arrayLength - i - 1];
+		ptr_indexesAttendance[arrayLength - i - 1] = temporaryElement;
+	}
+	return ptr_indexesAttendance;
 }
 
 static int ConductBinarySearch(string soughtSurname, StudentSurnameIndex* ptr_indexesSurname, int leftLimit, int rightLimit) {
@@ -262,27 +268,34 @@ static int ConductBinarySearch(string soughtSurname, StudentSurnameIndex* ptr_in
 	}
 }
 
-static int ConductBinarySearch(int soughtSurname, StudentAttendanceNumberIndex* ptr_indexesAttendance, int leftLimit, int rightLimit) {
-	if (leftLimit > rightLimit) {
-		return -1; // Элемент не найден
+static int ConductBinarySearch(int soughtAttendamceNumber, StudentAttendanceNumberIndex* ptr_indexesAttendance, unsigned short arrayLength) {
+	ptr_indexesAttendance = ReverseArray(ptr_indexesAttendance, arrayLength);
+	int leftLimit = 0;
+	int rightLimit = arrayLength - 1;
+	while (rightLimit > leftLimit)
+	{
+		int middlePointer = (rightLimit + leftLimit) / 2;
+		if (GetKeyValue(ptr_indexesAttendance[middlePointer]) < soughtAttendamceNumber) {
+			leftLimit = middlePointer + 1;
+		}
+		else if (GetKeyValue(ptr_indexesAttendance[middlePointer]) > soughtAttendamceNumber) {
+			rightLimit = middlePointer - 1;
+		}
+		else {
+			return middlePointer;
+		}
 	}
-
-	int middlePointer = leftLimit + (rightLimit - leftLimit) / 2; // Находим средний индекс
-
-	if (GetKeyValue(ptr_indexesAttendance[middlePointer]) == soughtSurname) {
-		return middlePointer; // Элемент найден, возвращаем индекс
-	}
-	else if (GetKeyValue(ptr_indexesAttendance[middlePointer]) > soughtSurname) {
-		return ConductBinarySearch(soughtSurname, ptr_indexesAttendance, leftLimit, middlePointer - 1); // Ищем в левой половине
+	if (GetKeyValue(ptr_indexesAttendance[leftLimit]) == soughtAttendamceNumber) {
+		return leftLimit;
 	}
 	else {
-		return ConductBinarySearch(soughtSurname, ptr_indexesAttendance, middlePointer + 1, rightLimit); // Ищем в правой половине
+		return -1; // если элемент не найден
 	}
 }
 
 static void FindSurnameUsingRecursion(unsigned short arrayLength, Student* ptr_studentsArray, StudentSurnameIndex* ptr_indexesSurname) {
 	string soughtSurname;
-	cout << "Введите искомое число - число посещений у студента: ";
+	cout << "Введите искомую строку - фамилию студента: ";
 	cin >> soughtSurname;
 	int indexSoughtElement = ConductBinarySearch(soughtSurname, ptr_indexesSurname, 0, arrayLength - 1);
 	if (indexSoughtElement == -1) {
@@ -311,6 +324,54 @@ static void FindSurnameUsingRecursion(unsigned short arrayLength, Student* ptr_s
 		int currentInitialIndex;
 		for (int i = neighbourLeftElementIndex + 1; i < neighbourRightElementIndex; i++) {
 			currentInitialIndex = ptr_indexesSurname[i].initialIndex;
+			cout << "_________________________________________________________________________________" << endl;
+			cout << "Номер студенческого билета для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentID << endl;
+			cout << "Фамилия студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentSurname << endl;
+			cout << "Имя студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentName << endl;
+			cout << "Отчество студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentSecondName << endl;
+			cout << "Корпоративная электронная почта студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentEmail << endl;
+			cout << "Спортивный разряд студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentSportRanking << endl;
+			cout << "Группа здоровья студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentHealthCategory << endl;
+			cout << "Спортивная секция, на которую записан студент, для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentSportActivity << endl;
+			cout << "Число посещений спортивной секции у студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentSportActivityAttendanceNumber << endl;
+		}
+		cout << "_________________________________________________________________________________" << endl;
+		cout << "_________________________________________________________________________________" << endl;
+		cout << "_________________________________________________________________________________" << endl;
+	}
+}
+
+static void FindAttendanceNumberUsingIterations(unsigned short arrayLength, Student* ptr_studentsArray, StudentAttendanceNumberIndex* ptr_indexesAttendance) {
+	int soughtAttendanceNumber;
+	cout << "Введите искомое число - число посещений у студента: ";
+	cin >> soughtAttendanceNumber;
+	int indexSoughtElement = ConductBinarySearch(soughtAttendanceNumber, ptr_indexesAttendance, arrayLength);
+	if (indexSoughtElement == -1) {
+		cout << "Искомый элемент не найден." << endl;
+	}
+	else {
+		int neighbourLeftElementIndex = indexSoughtElement;
+		int neighbourRightElementIndex = indexSoughtElement;
+		bool isSoughtNeighbourLeftElement = true;
+		bool isSoughtNeighbourRightElement = true;
+		while (isSoughtNeighbourLeftElement || isSoughtNeighbourRightElement) {
+			if ((neighbourLeftElementIndex <= -1) || (GetKeyValue(ptr_indexesAttendance[neighbourLeftElementIndex]) != soughtAttendanceNumber)) {
+				isSoughtNeighbourLeftElement = false;
+			}
+			else {
+				neighbourLeftElementIndex--;
+			}
+			if ((neighbourRightElementIndex >= arrayLength) || (GetKeyValue(ptr_indexesAttendance[neighbourRightElementIndex]) != soughtAttendanceNumber)) {
+				isSoughtNeighbourRightElement = false;
+			}
+			else {
+				neighbourRightElementIndex++;
+			}
+		}
+		cout << "Найденная(-ые) запись(-и) с искомым элементом:" << endl;
+		int currentInitialIndex;
+		for (int i = neighbourLeftElementIndex + 1; i < neighbourRightElementIndex; i++) {
+			currentInitialIndex = ptr_indexesAttendance[i].initialIndex;
 			cout << "_________________________________________________________________________________" << endl;
 			cout << "Номер студенческого билета для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentID << endl;
 			cout << "Фамилия студента для " << currentInitialIndex + 1 << " записи: " << ptr_studentsArray[currentInitialIndex].studentSurname << endl;
@@ -419,7 +480,7 @@ int main()
 			break;
 			case 2:
 			{
-				PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
+				FindAttendanceNumberUsingIterations(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
 			}
 			break;
 			default:
@@ -430,16 +491,9 @@ int main()
 		int menuPointRedact;
 		do {
 			cout << "Выберите, какое значение вы хотите отредактировать:" << endl;
-			cout << "1. Номер студенческого билета студента." << endl;
-			cout << "2. Фамилию студента." << endl;
-			cout << "3. Имя студента." << endl;
-			cout << "4. Отчество студента." << endl;
-			cout << "5. Адрес корпоративной электронной почты студента." << endl;
-			cout << "6. Спортивный разряд студента." << endl;
-			cout << "7. Номер группы здоровья студента." << endl;
-			cout << "8. Спортивную секцию, на которую записался студент." << endl;
-			cout << "9. Количество посещений спортивной секции у студента." << endl;
-			cout << "10. Завершить редактирование." << endl;
+			cout << "1. Фамилию студента." << endl;
+			cout << "2. Количество посещений спортивной секции у студента." << endl;
+			cout << "3. Завершить редактирование." << endl;
 			cout << "Введите номер выбранного вами пункта: ";
 			cin >> menuPointRedact;
 
@@ -452,7 +506,7 @@ int main()
 			break;
 			case 2:
 			{
-				PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
+				FindAttendanceNumberUsingIterations(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
 			}
 			break;
 			default:

@@ -434,7 +434,7 @@ static void EditIndexesArray(unsigned short arrayLength, Student* ptr_studentsAr
 		int temporaryIndex = -1;
 		string temporarySurname = "";
 		int insertionIndex = -1;
-		if (editedRecordIndex > 0 && GetKeyValue(ptr_indexesSurname[editedRecordIndex -1]) > currentSurname) {
+		if (GetKeyValue(ptr_indexesSurname[editedRecordIndex -1]) > currentSurname) {
 			int checkedInsertionIndex = ConductBinarySearchWhileEditing(currentSurname, ptr_indexesSurname, 0, editedRecordIndex - 1);
 			cout << "checkedInsertionIndex=" << checkedInsertionIndex << endl;
 			if (GetKeyValue(ptr_indexesSurname[checkedInsertionIndex]) < currentSurname) {

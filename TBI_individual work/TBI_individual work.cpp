@@ -412,13 +412,27 @@ static int ConductBinarySearchWhileEditing(string soughtSurname, StudentSurnameI
 	return leftLimit;
 }
 
+static int ConductBinarySearchWhileEditing(int soughtAttendanceNumber, StudentAttendanceNumberIndex* ptr_indexesAttendance, int leftLimit, int rightLimit) {
+	while (rightLimit > leftLimit)
+	{
+		int middlePointer = (rightLimit + leftLimit) / 2;
+		if (GetKeyValue(ptr_indexesAttendance[middlePointer]) < soughtAttendanceNumber) {
+			leftLimit = middlePointer + 1;
+		}
+		else {
+			rightLimit = middlePointer - 1;
+		}
+	}
+	return leftLimit;
+}
+
 static void EditIndexesArray(unsigned short arrayLength, Student* ptr_studentsArray, StudentSurnameIndex* ptr_indexesSurname) {
 	PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesSurname);
 	int neededInitialIndex;
 	cout << "Выберите номер записи, которую хотите отредактировать: ";
 	cin >> neededInitialIndex;
 	int editedRecordIndex;
-	if (neededInitialIndex - 1 > 0 && neededInitialIndex - 1 < arrayLength) {
+	if (neededInitialIndex > 0 && neededInitialIndex - 1 < arrayLength) {
 		for (int i = 0; i < arrayLength; i++) {
 			if (ptr_indexesSurname[i].initialIndex == neededInitialIndex - 1) {
 				editedRecordIndex = i;
@@ -428,13 +442,13 @@ static void EditIndexesArray(unsigned short arrayLength, Student* ptr_studentsAr
 		}
 
 		string currentSurname;
-		cout << "Выберите новую фамилию для студента в записи №" << neededInitialIndex << ": ";
+		cout << "Введите новую фамилию для студента в записи №" << neededInitialIndex << ": ";
 		cin >> currentSurname;
 		ptr_studentsArray[neededInitialIndex - 1].studentSurname = currentSurname;
 		int temporaryIndex = -1;
 		string temporarySurname = "";
 		int insertionIndex = -1;
-		if (editedRecordIndex > 0 && GetKeyValue(ptr_indexesSurname[editedRecordIndex -1]) > currentSurname) {
+		if (editedRecordIndex > 0 && GetKeyValue(ptr_indexesSurname[editedRecordIndex - 1]) > currentSurname) {
 			int checkedInsertionIndex = ConductBinarySearchWhileEditing(currentSurname, ptr_indexesSurname, 0, editedRecordIndex - 1);
 			cout << "checkedInsertionIndex=" << checkedInsertionIndex << endl;
 			if (GetKeyValue(ptr_indexesSurname[checkedInsertionIndex]) < currentSurname) {
@@ -454,11 +468,157 @@ static void EditIndexesArray(unsigned short arrayLength, Student* ptr_studentsAr
 			ptr_indexesSurname[insertionIndex + 1].initialIndex = temporaryIndex;
 			ptr_indexesSurname[insertionIndex + 1].studentSurname = temporarySurname;
 		}
+		else if (editedRecordIndex < arrayLength - 1 && GetKeyValue(ptr_indexesSurname[editedRecordIndex + 1]) < currentSurname) {
+			int checkedInsertionIndex = ConductBinarySearchWhileEditing(currentSurname, ptr_indexesSurname, editedRecordIndex + 1, arrayLength - 1);
+			cout << "checkedInsertionIndex=" << checkedInsertionIndex << endl;
+			if (GetKeyValue(ptr_indexesSurname[checkedInsertionIndex]) < currentSurname) {
+				insertionIndex = min(checkedInsertionIndex, arrayLength - 1);
+			}
+			else {
+				insertionIndex = max(checkedInsertionIndex - 1, 0);
+			}
+			temporaryIndex = ptr_indexesSurname[insertionIndex].initialIndex;
+			temporarySurname = GetKeyValue(ptr_indexesSurname[insertionIndex]);
+			ptr_indexesSurname[insertionIndex].initialIndex = neededInitialIndex - 1;
+			ptr_indexesSurname[insertionIndex].studentSurname = currentSurname;
+			for (int j = editedRecordIndex; j < insertionIndex - 1; j++) {
+				ptr_indexesSurname[j].initialIndex = ptr_indexesSurname[j + 1].initialIndex;
+				ptr_indexesSurname[j].studentSurname = ptr_indexesSurname[j + 1].studentSurname;
+			}
+			ptr_indexesSurname[insertionIndex - 1].initialIndex = temporaryIndex;
+			ptr_indexesSurname[insertionIndex - 1].studentSurname = temporarySurname;
+		}
 		PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesSurname);
 	}
 	else {
 		cout << "Записи с данным номером нет в массиве данных.";
 	}
+}
+
+static void EditIndexesArray(unsigned short arrayLength, Student* ptr_studentsArray, StudentAttendanceNumberIndex* ptr_indexesAttendance) {
+	PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
+	ptr_indexesAttendance = ReverseArray(ptr_indexesAttendance, arrayLength);
+	int neededInitialIndex;
+	cout << "Выберите номер записи, которую хотите отредактировать: ";
+	cin >> neededInitialIndex;
+	int editedRecordIndex;
+	if (neededInitialIndex > 0 && neededInitialIndex - 1 < arrayLength) {
+		for (int i = 0; i < arrayLength; i++) {
+			if (ptr_indexesAttendance[i].initialIndex == neededInitialIndex - 1) {
+				editedRecordIndex = i;
+				cout << "editedRecordIndex=" << editedRecordIndex << endl;
+				break;
+			}
+		}
+
+		int currentAttendanceNumber;
+		cout << "Введите новое число посещений для студента в записи №" << neededInitialIndex << ": ";
+		cin >> currentAttendanceNumber;
+		ptr_studentsArray[neededInitialIndex - 1].studentSportActivityAttendanceNumber = currentAttendanceNumber;
+		int temporaryIndex = -1;
+		int temporaryAttendanceNumber = 0;
+		int insertionIndex = -1;
+		if (editedRecordIndex > 0 && GetKeyValue(ptr_indexesAttendance[editedRecordIndex - 1]) > currentAttendanceNumber) {
+			int checkedInsertionIndex = ConductBinarySearchWhileEditing(currentAttendanceNumber, ptr_indexesAttendance, 0, editedRecordIndex - 1);
+			cout << "checkedInsertionIndex=" << checkedInsertionIndex << endl;
+			if (GetKeyValue(ptr_indexesAttendance[checkedInsertionIndex]) < currentAttendanceNumber) {
+				insertionIndex = min(checkedInsertionIndex + 1, editedRecordIndex);
+			}
+			else {
+				insertionIndex = max(checkedInsertionIndex, 0);
+			}
+			temporaryIndex = ptr_indexesAttendance[insertionIndex].initialIndex;
+			temporaryAttendanceNumber = GetKeyValue(ptr_indexesAttendance[insertionIndex]);
+			ptr_indexesAttendance[insertionIndex].initialIndex = neededInitialIndex - 1;
+			ptr_indexesAttendance[insertionIndex].studentSportActivityAttendanceNumber = currentAttendanceNumber;
+			for (int j = editedRecordIndex; j > insertionIndex + 1; j--) {
+				ptr_indexesAttendance[j].initialIndex = ptr_indexesAttendance[j - 1].initialIndex;
+				ptr_indexesAttendance[j].studentSportActivityAttendanceNumber = ptr_indexesAttendance[j - 1].studentSportActivityAttendanceNumber;
+			}
+			ptr_indexesAttendance[insertionIndex + 1].initialIndex = temporaryIndex;
+			ptr_indexesAttendance[insertionIndex + 1].studentSportActivityAttendanceNumber = temporaryAttendanceNumber;
+		}
+		else if (editedRecordIndex < arrayLength - 1 && GetKeyValue(ptr_indexesAttendance[editedRecordIndex + 1]) < currentAttendanceNumber) {
+			int checkedInsertionIndex = ConductBinarySearchWhileEditing(currentAttendanceNumber, ptr_indexesAttendance, editedRecordIndex + 1, arrayLength - 1);
+			cout << "checkedInsertionIndex=" << checkedInsertionIndex << endl;
+			if (GetKeyValue(ptr_indexesAttendance[checkedInsertionIndex]) < currentAttendanceNumber) {
+				insertionIndex = min(checkedInsertionIndex, arrayLength - 1);
+			}
+			else {
+				insertionIndex = max(checkedInsertionIndex - 1, 0);
+			}
+			temporaryIndex = ptr_indexesAttendance[insertionIndex].initialIndex;
+			temporaryAttendanceNumber = GetKeyValue(ptr_indexesAttendance[insertionIndex]);
+			ptr_indexesAttendance[insertionIndex].initialIndex = neededInitialIndex - 1;
+			ptr_indexesAttendance[insertionIndex].studentSportActivityAttendanceNumber = temporaryAttendanceNumber;
+			for (int j = editedRecordIndex; j < insertionIndex - 1; j++) {
+				ptr_indexesAttendance[j].initialIndex = ptr_indexesAttendance[j + 1].initialIndex;
+				ptr_indexesAttendance[j].studentSportActivityAttendanceNumber = ptr_indexesAttendance[j + 1].studentSportActivityAttendanceNumber;
+			}
+			ptr_indexesAttendance[insertionIndex - 1].initialIndex = temporaryIndex;
+			ptr_indexesAttendance[insertionIndex - 1].studentSportActivityAttendanceNumber = temporaryAttendanceNumber;
+		}
+	}
+	else {
+		cout << "Записи с данным номером нет в массиве данных.";
+	}
+	ptr_indexesAttendance = ReverseArray(ptr_indexesAttendance, arrayLength);
+	PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
+}
+
+static void DeleteOrderByNumber(unsigned short arrayLength, int deletedOrderIndex, Student* ptr_studentsArray, StudentAttendanceNumberIndex* ptr_indexesAttendance, StudentSurnameIndex* ptr_indexesSurname) {
+	Student* temporaryStudentsArray = new Student[arrayLength - 1];
+	StudentAttendanceNumberIndex* temporaryIndexesAttendance = new StudentAttendanceNumberIndex[arrayLength - 1];
+	StudentSurnameIndex* temporaryIndexesSurname = new StudentSurnameIndex[arrayLength - 1];
+	for (int i = 0; i < arrayLength - 1; i++) {
+		if (i < deletedOrderIndex - 1) {
+			temporaryStudentsArray[i] = ptr_studentsArray[i];
+		}
+		else {
+			temporaryStudentsArray[i] = ptr_studentsArray[i+1];
+		}
+	}
+	for (int i = 0; i < arrayLength-1; i++) {
+		cout << temporaryStudentsArray[i].studentSurname << endl;
+	}
+	delete[] ptr_studentsArray;
+	int j = 0;
+	while (ptr_indexesAttendance[j].initialIndex != deletedOrderIndex - 1 && j < arrayLength - 1) {
+		if (ptr_indexesAttendance[j].initialIndex < deletedOrderIndex - 1) {
+			temporaryIndexesAttendance[j] = ptr_indexesAttendance[j];
+			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 1" << endl;
+		}
+		else {
+			temporaryIndexesAttendance[j].initialIndex = ptr_indexesAttendance[j].initialIndex - 1;
+			temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber = ptr_indexesAttendance[j].studentSportActivityAttendanceNumber;
+			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 2" << endl;
+		}
+		j++;
+	}
+	for (j; j < arrayLength - 1; j++) {
+		if (ptr_indexesAttendance[j + 1].initialIndex < deletedOrderIndex - 1) {
+			temporaryIndexesAttendance[j] = ptr_indexesAttendance[j+1];
+			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 3" << endl;
+		}
+		else {
+			temporaryIndexesAttendance[j].initialIndex = ptr_indexesAttendance[j + 1].initialIndex - 1;
+			temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber = ptr_indexesAttendance[j + 1].studentSportActivityAttendanceNumber;
+			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 4" << endl;
+		}
+	}
+	ptr_studentsArray = new Student[arrayLength - 1];
+	ptr_indexesAttendance = new StudentAttendanceNumberIndex[arrayLength - 1];
+	ptr_indexesSurname = new StudentSurnameIndex[arrayLength - 1];
+	for (int n = 0; n < arrayLength - 1; n++) {
+		ptr_studentsArray[n] = temporaryStudentsArray[n];
+		ptr_indexesAttendance[n] = temporaryIndexesAttendance[n];
+		ptr_indexesSurname[n] = temporaryIndexesSurname[n];
+		cout << ptr_studentsArray[n].studentSurname << " " << n << endl;
+		cout << ptr_indexesAttendance[n].studentSportActivityAttendanceNumber << ptr_indexesAttendance[n].initialIndex << endl;
+	}
+	delete[] temporaryStudentsArray;
+	delete[] temporaryIndexesAttendance;
+	delete[] temporaryIndexesSurname;
 }
 
 int main()
@@ -578,19 +738,32 @@ int main()
 			break;
 			case 2:
 			{
-				FindAttendanceNumberUsingIterations(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
+				EditIndexesArray(arrayLength, ptr_studentsArray, ptr_indexesAttendance);
 			}
 			break;
 			default:
 				break;
 			}
 		} while (menuPointRedact != 3);
+
+		PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesSurname);
+		int editedOrderNumber;
+
+		cout << "Введите номер записи, которую хотите удалить, или введите \"-1\", если желаете завершить работу программы: ";
+		cin >> editedOrderNumber;
+		if (editedOrderNumber <= arrayLength) {
+			DeleteOrderByNumber(arrayLength, editedOrderNumber, ptr_studentsArray, ptr_indexesAttendance, ptr_indexesSurname);
+			PrintSortedArray(arrayLength - 1, ptr_studentsArray, ptr_indexesAttendance);
+		}
+		else if (editedOrderNumber > arrayLength) {
+			cout << "Записи с таким номером нет в массиве.";
+		}
 	}
 	else
 	{
 		cout << "Память для массива исходных данных не была выделена." << endl;
 	}
-
+	cout << "Работа завершена.";
 	delete[] ptr_studentsArray;
 	delete[] ptr_indexesSurname;
 	delete[] ptr_indexesAttendance;

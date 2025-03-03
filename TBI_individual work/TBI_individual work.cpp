@@ -586,26 +586,31 @@ static void DeleteOrderByNumber(unsigned short arrayLength, int deletedOrderInde
 	while (ptr_indexesAttendance[j].initialIndex != deletedOrderIndex - 1 && j < arrayLength - 1) {
 		if (ptr_indexesAttendance[j].initialIndex < deletedOrderIndex - 1) {
 			temporaryIndexesAttendance[j] = ptr_indexesAttendance[j];
-			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 1" << endl;
+			temporaryIndexesSurname[j] = ptr_indexesSurname[j];
 		}
 		else {
 			temporaryIndexesAttendance[j].initialIndex = ptr_indexesAttendance[j].initialIndex - 1;
 			temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber = ptr_indexesAttendance[j].studentSportActivityAttendanceNumber;
-			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 2" << endl;
+			temporaryIndexesSurname[j].initialIndex = ptr_indexesSurname[j].initialIndex - 1;
+			temporaryIndexesSurname[j].studentSurname = ptr_indexesSurname[j].studentSurname;
 		}
 		j++;
 	}
 	for (j; j < arrayLength - 1; j++) {
 		if (ptr_indexesAttendance[j + 1].initialIndex < deletedOrderIndex - 1) {
 			temporaryIndexesAttendance[j] = ptr_indexesAttendance[j+1];
-			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 3" << endl;
+			temporaryIndexesSurname[j] = ptr_indexesSurname[j+1];
 		}
 		else {
 			temporaryIndexesAttendance[j].initialIndex = ptr_indexesAttendance[j + 1].initialIndex - 1;
 			temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber = ptr_indexesAttendance[j + 1].studentSportActivityAttendanceNumber;
-			//cout << temporaryIndexesAttendance[j].initialIndex << " " << temporaryIndexesAttendance[j].studentSportActivityAttendanceNumber << " 4" << endl;
+			temporaryIndexesSurname[j].initialIndex = ptr_indexesSurname[j+1].initialIndex - 1;
+			temporaryIndexesSurname[j].studentSurname = ptr_indexesSurname[j+1].studentSurname;
 		}
 	}
+	delete[] ptr_indexesAttendance;
+	delete[] ptr_indexesSurname;
+
 	ptr_studentsArray = new Student[arrayLength - 1];
 	ptr_indexesAttendance = new StudentAttendanceNumberIndex[arrayLength - 1];
 	ptr_indexesSurname = new StudentSurnameIndex[arrayLength - 1];
@@ -619,6 +624,25 @@ static void DeleteOrderByNumber(unsigned short arrayLength, int deletedOrderInde
 	delete[] temporaryStudentsArray;
 	delete[] temporaryIndexesAttendance;
 	delete[] temporaryIndexesSurname;
+}
+
+static void PrintArray(Student* ptr_studentsArray, int arrayLength) {
+	for (int i = 0; i < arrayLength; i++) {
+		cout << "_________________________________________________________________________________" << endl;
+		cout << "Запись №" << i + 1 << ": " << endl;
+		cout << "Номер студенческого билета: " << ptr_studentsArray[i].studentID << endl;
+		cout << "Фамилия студента: " << ptr_studentsArray[i].studentSurname << endl;
+		cout << "Имя студента: " << ptr_studentsArray[i].studentName << endl;
+		cout << "Отчество студента: " << ptr_studentsArray[i].studentSecondName << endl;
+		cout << "Корпоративная электронная почта студента: " << ptr_studentsArray[i].studentEmail << endl;
+		cout << "Спортивный разряд студента: " << ptr_studentsArray[i].studentSportRanking << endl;
+		cout << "Группа здоровья студента: " << ptr_studentsArray[i].studentHealthCategory << endl;
+		cout << "Спортивная секция, на которую записан студент: " << ptr_studentsArray[i].studentSportActivity << endl;
+		cout << "Число посещений спортивной секции у студента: " << ptr_studentsArray[i].studentSportActivityAttendanceNumber << endl;
+	}
+	cout << "_________________________________________________________________________________" << endl;
+	cout << "_________________________________________________________________________________" << endl;
+	cout << "_________________________________________________________________________________" << endl;
 }
 
 int main()
@@ -746,14 +770,14 @@ int main()
 			}
 		} while (menuPointRedact != 3);
 
-		PrintSortedArray(arrayLength, ptr_studentsArray, ptr_indexesSurname);
+		PrintArray(ptr_studentsArray, arrayLength);
 		int editedOrderNumber;
 
 		cout << "Введите номер записи, которую хотите удалить, или введите \"-1\", если желаете завершить работу программы: ";
 		cin >> editedOrderNumber;
 		if (editedOrderNumber <= arrayLength) {
 			DeleteOrderByNumber(arrayLength, editedOrderNumber, ptr_studentsArray, ptr_indexesAttendance, ptr_indexesSurname);
-			PrintSortedArray(arrayLength - 1, ptr_studentsArray, ptr_indexesAttendance);
+			PrintArray(ptr_studentsArray, arrayLength-1);
 		}
 		else if (editedOrderNumber > arrayLength) {
 			cout << "Записи с таким номером нет в массиве.";
@@ -764,9 +788,10 @@ int main()
 		cout << "Память для массива исходных данных не была выделена." << endl;
 	}
 	cout << "Работа завершена.";
+	
 	delete[] ptr_studentsArray;
-	delete[] ptr_indexesSurname;
-	delete[] ptr_indexesAttendance;
+	//delete[] ptr_indexesAttendance;
+	//delete[] ptr_indexesSurname;
 
 	return 0;
 }
